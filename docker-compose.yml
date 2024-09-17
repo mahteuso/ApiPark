@@ -1,0 +1,19 @@
+version: '3.1'
+
+services:
+
+  mysql:
+    image: mysql
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laboratorio
+      MYSQL_ROOT_USER: root
+
+    volumes:
+      - mysql_data_container:/data/db
+
+volumes:
+  mysql_data_container:
