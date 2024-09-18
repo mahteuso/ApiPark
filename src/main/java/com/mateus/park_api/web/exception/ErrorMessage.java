@@ -28,7 +28,7 @@ public class ErrorMessage {
     private Map<String, String> errors;
 
 
-    public ErrorMessage(HttpServletRequest request, HttpStatus badRequest, Message message) {
+    public ErrorMessage() {
     }
 
     public ErrorMessage(HttpServletRequest request, HttpStatus status, String message){
