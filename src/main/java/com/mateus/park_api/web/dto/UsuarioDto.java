@@ -39,5 +39,9 @@ public class UsuarioDto {
 
     private String modificadoPor;
 
+    public UsuarioDto(String userName, String password){
+        this.userName = userName;
+        this.password = password;
+    }
 
 }
