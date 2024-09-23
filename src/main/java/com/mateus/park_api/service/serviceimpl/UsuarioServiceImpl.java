@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -95,6 +96,23 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         user.setPassword(novaSena);
         usuarioRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario loadUserByUsername(String userName) {
+        try{
+            Optional<Usuario> opt = usuarioRepository.loadUserByUsername(userName);
+            return opt.get();
+        } catch(NotFoundClientId nt){
+            throw new NotFoundClientId(String.format("Usuário com '%s' não encontrado", userName));
+        }
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario.Role findRoleByUsername(String userName) {
+        return usuarioRepository.findRoleByUsername(userName);
     }
 
 }
