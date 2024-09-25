@@ -22,5 +22,5 @@ public interface UsuarioService {
 
     Usuario loadUserByUsername(String userName);
 
-    Usuario.Role findRoleByUsername(String userName);
+   Usuario.Role findRoleByUsername(String userName);
 }

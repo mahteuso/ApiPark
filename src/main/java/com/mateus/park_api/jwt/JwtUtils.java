@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -14,6 +15,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Slf4j
+@Component
 public class JwtUtils {
 
     public static final String JWT_BEARER = "Bearer";
@@ -66,7 +68,9 @@ public class JwtUtils {
             log.error(String.format("Token inválido %s", ex.getMessage()));
         }
 
-        return null;
+       return Jwts.parser()
+                .setSigningKey(generateKey()).build()
+                .parseClaimsJws(refactorToken(token)).getBody();
     }
 
     public static String getUserNameFromToken(String token) {

@@ -11,12 +11,12 @@ import com.mateus.park_api.web.dto.UsuarioDtoResponse;
 import com.mateus.park_api.web.exception.BadRequestDeleteUser;
 import com.mateus.park_api.web.mapper.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +24,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UsuarioDtoResponse save(UsuarioDto dto) {
         try {
             Usuario user = usuarioRepository.save(UsuarioMapper.fromDtoToEntity(dto));
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return UsuarioMapper.fromEntityToDtoResponse(user);
         } catch (org.springframework.dao.DataIntegrityViolationException dt) {
             throw new UserNameIntegrityViolationException(String.format("Usuário {%s} já cadastrado", dto.getUserName()));
@@ -86,23 +88,23 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new PasswordInvalidException(String.format("As senhas são diferentes {%s} != {%s}", novaSena, confirmaSenha));
         }
 
-        if (!senhaAtual.equals(user.getPassword())) {
-            throw new PasswordInvalidException("Senha atual não registrada");
+        if (!passwordEncoder.matches(senhaAtual, user.getPassword())) {
+            throw new PasswordInvalidException("Senha não registrada");
         }
 
         if (user.getPassword().equals(novaSena)) {
             throw new PasswordInvalidException("Senha atual não pode ser igual a nova senha");
         }
 
-        user.setPassword(novaSena);
+        user.setPassword(passwordEncoder.encode(novaSena));
         usuarioRepository.save(user);
     }
 
     @Transactional(readOnly = true)
     public Usuario loadUserByUsername(String userName) {
         try{
-            Optional<Usuario> opt = usuarioRepository.loadUserByUsername(userName);
-            return opt.get();
+           Long id = usuarioRepository.loadUserByUsername(userName);
+            return usuarioRepository.findById(id).get();
         } catch(NotFoundClientId nt){
             throw new NotFoundClientId(String.format("Usuário com '%s' não encontrado", userName));
         }
